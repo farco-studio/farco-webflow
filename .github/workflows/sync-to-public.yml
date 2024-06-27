@@ -1,0 +1,25 @@
+name: Sync to Public Repo
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Sync files to public repo
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git clone --depth 1 --branch main https://${{ secrets.GH_TOKEN }}@github.com/farco-studio/farco-webflow/ public-repo
+          rsync -av --delete ./assets/lottie/ public-repo/assets/lottie/
+          cd public-repo
+          git add .
+          git commit -m "Sync files from private repo"
+          git push
